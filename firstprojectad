@@ -1,0 +1,162 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define MAX 100
+#define FILENAME "jinispati.txt"
+
+FILE *hhh;
+
+struct jinis
+{
+    char name[MAX];
+    int quantity;
+    float price;
+};
+
+struct jinis jinispati[MAX];
+int pCount=0;
+
+void readDetails()
+{
+    hhh = fopen(FILENAME, "r");
+    if (hhh != NULL)
+    {
+        while (fscanf(hhh, "%s %d %f", &jinispati[pCount].name, &jinispati[pCount].quantity, &jinispati[pCount].price) != EOF)
+        {
+            pCount++;
+        }
+        fclose(hhh);
+    }
+}
+
+void writeDetails()
+{
+    hhh = fopen(FILENAME, "w");
+    if (hhh != NULL)
+    {
+        for (int i = 0; i < pCount; i++)
+        {
+            fprintf(hhh, "%s %d %.2f\n", jinispati[i].name, jinispati[i].quantity, jinispati[i].price);
+        }
+        fclose(hhh);
+    }
+}
+
+
+
+void clearS()
+{
+    system("cls");
+}
+
+void displayMenu()
+{
+    clearS();
+    printf("\n");
+    printf("\t **Daily Super Shop**\n");
+    printf("    -----------------------------\n");
+    printf("\n");
+    printf("\t1. View Product List\n");
+    printf("\t2. Add Product\n");
+    printf("\t3. Exit\n");
+}
+
+void homepage()
+{
+    printf("\nPress any key to homepage.");
+    getchar();
+    getchar();
+}
+
+void productList()
+{
+    clearS();
+    printf("\nProduct List:\n");
+    if (pCount == 0)
+    {
+        printf("No jinispati available\n");
+    }
+    else
+    {
+        for (int i = 0; i < pCount; i++)
+        {
+            printf("%d. %s - Quantity: %d - Price per unit: %.2f tk\n", i + 1, jinispati[i].name, jinispati[i].quantity, jinispati[i].price);
+        }
+    }
+    homepage();
+}
+
+void addProduct()
+{
+    clearS();
+    char name[MAX];
+    int quantity;
+    float price;
+
+    printf("\nEnter product name: ");
+    scanf("%s", name);
+    printf("Enter product quantity: ");
+    scanf("%d", &quantity);
+    printf("Enter product price: ");
+    scanf("%f", &price);
+
+    for (int i=0; i < pCount; i++)
+    {
+        if (strcmp(jinispati[i].name, name) == 0)
+        {
+            printf("Product already exists. Updating quantity...\n");
+            jinispati[i].quantity += quantity;
+            writeDetails();
+            printf("Product quantity updated successfully.\n");
+            homepage();
+            return;
+        }
+    }
+
+    if (pCount < MAX)
+    {
+        strcpy(jinispati[pCount].name, name);
+        jinispati[pCount].quantity = quantity;
+        jinispati[pCount].price = price;
+        pCount++;
+
+        writeDetails();
+        printf("Product added successfully.\n");
+    }
+    else
+    {
+        printf("Limit reached. Cannot add more products.\n");
+    }
+
+    homepage();
+}
+
+int main()
+{
+    int choice;
+    readDetails();
+    do
+    {
+        displayMenu();
+        printf("\tEnter your choice: ");
+        scanf("%d", &choice);
+        switch(choice)
+        {
+        case 1:
+            productList();
+            break;
+        case 2:
+            addProduct();
+            break;
+        case 3:
+            printf("Exiting...\n");
+            break;
+        default:
+            printf("Invalid choice. Please try again.\n");
+            homepage();
+        }
+    }
+    while (choice != 3);
+
+    return 0;
+}
